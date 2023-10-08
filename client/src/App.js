@@ -2,9 +2,19 @@ import React, {useState, useEffect} from "react";
 import "./App.css";
 import AddBook from "./components/add-book";
 import Books from "./components/books";
+import axios from "axios";
+import { BrowserRouter, Route, Link, Routes } from 'react-router-dom';
 
 function App() {
   const  [books, setBooks] = useState([]);
+
+  const [book, setBook] = useState({
+    bookName:"",
+    author:"",
+    quantity:"",
+    department:"",
+    comment:"",
+  })
 
   useEffect(() => {
       fetch('/books').then(res => {
@@ -13,16 +23,60 @@ function App() {
           }
       }).then(jsonRes => setBooks(jsonRes))
   })
+
+
+  const handleChange = (e) =>{
+    const {name, value} = e.target;
+    setBook(prevInput=>{
+        return(
+            {
+                ...prevInput,
+                [name]: value
+            }
+        )
+    })
+  }
+
+  const addBookFunc = (e) =>{
+    e.preventDefault();
+    const newBook = {
+        bookName: book.bookName,
+        author: book.author,
+        quantity: book.quantity,
+        department: book.department,
+        comment: book.comment,
+    } 
+    axios.post('/newbook', newBook);
+    alert(`The book ${book.bookName} is added`)
+    setBook({bookName:"", author:"", quantity:"", department:"", comment:""})
+  }
+
+  const deleteBook = (id) => {
+    axios.delete('/delete/'+id);
+    alert(`The book wiht ${id} is deleted`);
+  }
+
+  const lendBook = (id) => {
+    axios.put('/lend/'+id);
+    alert(`The book wiht ${id} is lended`);
+  }
+
+  const backBook = (id) => {
+    axios.put('/back/'+id);
+    alert(`The book wiht ${id} is back`);
+  }
+
     return (
         <div classNameName="App">
+            <BrowserRouter>
             <nav
                 className="navbar navbar-expand-lg bg-body-tertiary"
                 data-bs-theme="dark"
             >
                 <div className="container-fluid">
-                    <a className="navbar-brand" href="#">
+                    <Link className="navbar-brand" to={"/"}>
                         RGB-BOOKS
-                    </a>
+                    </Link>
                     <button
                         className="navbar-toggler"
                         type="button"
@@ -37,17 +91,17 @@ function App() {
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                             <li className="nav-item">
-                                <a className="nav-link active" aria-current="page" href="#">
+                                <Link className="nav-link active" aria-current="page" href="/">
                                     Books
-                                </a>
+                                </Link>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link" href="#">
+                                <Link className="nav-link" to="/addbook">
                                     Add Book
-                                </a>
+                                </Link>
                             </li>
                             <li className="nav-item dropdown">
-                                <a
+                                <Link
                                     className="nav-link dropdown-toggle"
                                     href="#"
                                     role="button"
@@ -55,36 +109,36 @@ function App() {
                                     aria-expanded="false"
                                 >
                                     Departments
-                                </a>
+                                </Link>
                                 <ul className="dropdown-menu">
                                     <li>
-                                        <a className="dropdown-item" href="#">
+                                        <Link className="dropdown-item" href="#">
                                             History & Criticism
-                                        </a>
+                                        </Link>
                                     </li>
                                     <li>
                                         <hr className="dropdown-divider"/>
                                     </li>
                                     <li>
-                                        <a className="dropdown-item" href="#">
+                                        <Link className="dropdown-item" href="#">
                                             Religious
-                                        </a>
+                                        </Link>
                                     </li>
                                     <li>
                                         <hr className="dropdown-divider"/>
                                     </li>
                                     <li>
-                                        <a className="dropdown-item" href="#">
+                                        <Link className="dropdown-item" href="#">
                                             Music
-                                        </a>
+                                        </Link>
                                     </li>
                                     <li>
                                         <hr className="dropdown-divider"/>
                                     </li>
                                     <li>
-                                        <a className="dropdown-item" href="#">
+                                        <Link className="dropdown-item" href="#">
                                             Study & Teaching
-                                        </a>
+                                        </Link>
                                     </li>
                                 </ul>
                             </li>
@@ -103,8 +157,18 @@ function App() {
                     </div>
                 </div>
             </nav>
-            <AddBook/>
-            <Books books={books}/>
+
+            <Routes>
+                <Route exact path="/" element = {
+                    <Books books={books}  lendBook={lendBook} backBook={backBook} deleteBook = {deleteBook} />
+                } />
+                    
+                <Route path="/addbook" element = {
+                     <AddBook book={book} handleChange = {handleChange} addBookFunc={addBookFunc} />
+                } />
+                   
+            </Routes>
+            </BrowserRouter>
         </div>
     );
 }

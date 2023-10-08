@@ -1,6 +1,6 @@
 import React from "react";
 
-const Books = ({books}) => {
+const Books = ({books, deleteBook, lendBook, backBook}) => {
     return(
       <div className="container mt-5" >
         <table className="table table-hover table-dark" >
@@ -19,13 +19,20 @@ const Books = ({books}) => {
                 books.map((book, index) => {
                     return(
                         <tr scope="col" key={index}>
-                            <td>{book._id}</td>
+                            <td scope="col" >{book._id}</td>
                             <td>{book.bookName}</td>
                             <td>{book.author}</td>
                             <td>{book.department}</td>
                             <td>{book.quantity}</td>
-                            <td>{book.comment}</td>
-                            <td></td>
+                            <td>
+                                <button onClick={ () => deleteBook(book._id)} className="btn btn-primary" >DELETE</button> 
+                            </td>
+                            <td>
+                                <button onClick={ () => lendBook(book._id)} className="btn btn-primary" >LEND</button> 
+                            </td>
+                            <td>
+                                <button onClick={ () => backBook(book._id)} className="btn btn-primary" >BACK</button> 
+                            </td>
                         </tr>
                     )
                 })

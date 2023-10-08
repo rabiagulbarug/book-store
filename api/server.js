@@ -55,6 +55,32 @@ app.delete('/delete/:id' , async (req,res) => {
     }
 })
 
+app.put('/lend/:id' , async (req,res) => {
+    const id = req.params.id;
+    console.log("req params", req.params.id)
+
+    try {
+        await bookstore.findByIdAndUpdate(req.params.id, {$inc:{quantity:-1}})
+        res.status(204).json()
+    } catch (e) {
+        res.status(500).json()
+        console.log(e)
+    }
+})
+
+app.put('/back/:id' , async (req,res) => {
+    const id = req.params.id;
+    console.log("req params", req.params.id)
+
+    try {
+        await bookstore.findByIdAndUpdate(req.params.id, {$inc:{quantity:+1}})
+        res.status(204).json()
+    } catch (e) {
+        res.status(500).json()
+        console.log(e)
+    }
+})
+
 
 app.listen(3000, () => {
     console.log("server çalıştı ")
